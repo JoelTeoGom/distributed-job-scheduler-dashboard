@@ -1,0 +1,212 @@
+@import 'tailwindcss';
+@import '../src/styles/tokens.css';
+
+@theme inline {
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-surface-3: var(--surface-3);
+  --color-code: var(--code);
+  --color-border: var(--border);
+  --color-border-2: var(--border-2);
+  --color-text: var(--text);
+  --color-muted: var(--muted);
+  --color-subtle: var(--subtle);
+  --color-green: var(--green);
+  --color-green-bg: var(--green-bg);
+  --color-green-bd: var(--green-bd);
+  --color-red: var(--red);
+  --color-red-bg: var(--red-bg);
+  --color-red-bd: var(--red-bd);
+  --color-amber: var(--amber);
+  --color-amber-bg: var(--amber-bg);
+  --color-amber-bd: var(--amber-bd);
+  --color-blue: var(--blue);
+  --color-blue-bg: var(--blue-bg);
+  --color-blue-bd: var(--blue-bd);
+  --color-gray-bg: var(--gray-bg);
+
+  --radius-badge: var(--radius-badge);
+  --radius-control: var(--radius-control);
+  --radius-card: var(--radius-card);
+  --radius-tile: var(--radius-tile);
+
+  --ease-enter: var(--ease-enter);
+}
+
+@layer base {
+  * {
+    border-color: var(--border);
+  }
+
+  html {
+    color-scheme: dark;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-sans);
+    font-size: 14px;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--blue);
+    outline-offset: 2px;
+  }
+
+  input::placeholder,
+  textarea::placeholder {
+    color: var(--subtle);
+  }
+
+  button:not(:disabled),
+  [role='menuitem'],
+  [role='tab'] {
+    cursor: pointer;
+  }
+}
+
+@layer components {
+  .field-control {
+    width: 100%;
+    height: 38px;
+    border: 1px solid var(--border-2);
+    border-radius: var(--radius-control);
+    background: var(--surface);
+    padding: 0 12px;
+    color: var(--text);
+    font-size: 14px;
+  }
+
+  .field-control[aria-invalid='true'] {
+    border-color: var(--red-bd);
+  }
+
+  /* Rows navigate on click through ClickableRow; the link inside gives them Enter and the focus ring. */
+  .row-link {
+    outline: none;
+  }
+
+  .row-link:focus-visible::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    outline: 2px solid var(--blue);
+    outline-offset: -2px;
+    border-radius: 2px;
+    pointer-events: none;
+  }
+
+  .pulsing-dot::before {
+    animation: pulse-dot 1.6s var(--ease-enter) infinite;
+  }
+
+  .button-press {
+    transition-property: opacity, transform;
+    transition-duration: var(--duration-press);
+    transition-timing-function: var(--ease-enter);
+  }
+
+  .button-press:active:not(:disabled) {
+    transform: scale(0.98);
+  }
+
+  .overlay-enter[data-state='open'] {
+    animation: fade-in var(--duration-overlay) var(--ease-enter);
+  }
+
+  .overlay-enter[data-state='closed'] {
+    animation: fade-out var(--duration-overlay) var(--ease-leave);
+  }
+
+  .menu-enter[data-state='open'] {
+    animation: menu-in var(--duration-overlay) var(--ease-enter);
+  }
+
+  .menu-enter[data-state='closed'] {
+    animation: menu-out var(--duration-overlay) var(--ease-leave);
+  }
+
+  .dialog-enter[data-state='open'] {
+    animation: dialog-in var(--duration-overlay) var(--ease-enter);
+  }
+
+  .dialog-enter[data-state='closed'] {
+    animation: dialog-out var(--duration-overlay) var(--ease-leave);
+  }
+}
+
+@keyframes pulse-dot {
+  50% {
+    opacity: 0.35;
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes fade-out {
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes menu-in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+}
+
+@keyframes menu-out {
+  to {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+}
+
+@keyframes dialog-in {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.96);
+  }
+}
+
+@keyframes dialog-out {
+  to {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.96);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .button-press:active:not(:disabled) {
+    transform: none;
+  }
+
+  .pulsing-dot::before {
+    animation: none;
+  }
+
+  .menu-enter[data-state='open'],
+  .dialog-enter[data-state='open'] {
+    animation-name: fade-in;
+  }
+
+  .menu-enter[data-state='closed'],
+  .dialog-enter[data-state='closed'] {
+    animation-name: fade-out;
+  }
+
+  .animate-spin {
+    animation-duration: 2.4s;
+  }
+}

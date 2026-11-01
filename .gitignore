@@ -1,0 +1,32 @@
+# Dependencies
+node_modules/
+
+# Next.js build output
+.next/
+out/
+next-env.d.ts
+*.tsbuildinfo
+
+# Environment: JWT_SECRET lives here. Only the example is committed.
+.env*
+!.env.example
+
+# Tests and coverage
+coverage/
+test-results/
+playwright-report/
+
+# Logs
+*.log
+
+# Local environment: binaries, logs and generated seed files
+local-env/.run/
+
+# Deployment
+.vercel/
+
+# Local tooling and editors
+.claude/settings.local.json
+.idea/
+.vscode/
+.DS_Store
