@@ -1,0 +1,68 @@
+# Databases for the local environment. Migrations are mounted from the backend repo, read-only.
+name: scheduler-local
+
+services:
+  mysql:
+    image: mysql:8.4
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: scheduler
+      MYSQL_USER: scheduler
+      MYSQL_PASSWORD: scheduler
+    ports:
+      - "127.0.0.1:3307:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-uscheduler", "-pscheduler"]
+      interval: 3s
+      timeout: 3s
+      retries: 40
+
+  cassandra:
+    image: cassandra:5.0
+    environment:
+      CASSANDRA_RPC_ADDRESS: 0.0.0.0
+      CASSANDRA_BROADCAST_RPC_ADDRESS: 127.0.0.1
+      MAX_HEAP_SIZE: 512M
+      HEAP_NEWSIZE: 128M
+    ports:
+      - "127.0.0.1:9042:9042"
+    volumes:
+      - cassandra-data:/var/lib/cassandra
+      - ../../distributed-scheduler/job-service/migrations/cassandra:/migrations:ro
+    healthcheck:
+      test: ["CMD", "cqlsh", "-e", "describe keyspaces"]
+      interval: 5s
+      timeout: 5s
+      retries: 40
+
+  migrate-tasks:
+    image: migrate/migrate:v4.19.1
+    profiles: [migrate]
+    depends_on:
+      mysql:
+        condition: service_healthy
+    volumes:
+      - ../../distributed-scheduler/task-service/migrations:/migrations:ro
+    command:
+      - -path=/migrations
+      - -database=mysql://scheduler:scheduler@tcp(mysql:3306)/scheduler?x-migrations-table=task_service_migrations
+      - up
+
+  migrate-jobs:
+    image: migrate/migrate:v4.19.1
+    profiles: [migrate]
+    depends_on:
+      mysql:
+        condition: service_healthy
+    volumes:
+      - ../../distributed-scheduler/job-service/migrations/mysql:/migrations:ro
+    command:
+      - -path=/migrations
+      - -database=mysql://scheduler:scheduler@tcp(mysql:3306)/scheduler?x-migrations-table=job_service_migrations
+      - up
+
+volumes:
+  mysql-data:
+  cassandra-data:
